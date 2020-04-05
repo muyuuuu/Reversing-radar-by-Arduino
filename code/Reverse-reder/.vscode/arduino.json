@@ -1,5 +1,5 @@
 {
-    "port": "COM3",
+    "port": "COM6",
     "board": "arduino:avr:uno",
     "sketch": "Reverse-reder.ino"
 }

@@ -1,5 +1,3 @@
-// 使用库 *****************************************
-#include <SoftwareSerial.h>
 // 后方超声波 **************************************
 int trigBack = 13;
 int echoBack = A0;
@@ -13,7 +11,7 @@ int echoLeft = A2;
 String str = "";
 // 后侧超声波
 long cmB, cmR, cmL;
-	
+
 void setup() {
 	// 设置硬件串口通信的波特率
 	Serial.begin(9600);
@@ -58,11 +56,11 @@ void loop()
 	cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
 
 	// 串口输出距离
-	str += "B : ";
+	str += "B";
 	str += cmB;
-	str += "R : ";
+	str += "R";
 	str += cmR;
-	str += "L : ";
+	str += "L";
 	str += cmL;
 	if (Serial.available() > 0) 
 	{

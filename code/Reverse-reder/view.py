@@ -1,12 +1,24 @@
+###
+ # @Author         : lanling
+ # @Date           : 2020-04-06 11:58:29
+ # @LastEditTime: 2020-04-12 18:07:42
+ # @FilePath       : \Reverse-reder\view.py
+ # @Github         : https://github.com/muyuuuu
+ # @Description    : 
+ # @佛祖保佑，永无BUG
+###
+
 import sys, time, random, queue, qdarkstyle, serial
 from PyQt5.QtCore import Qt, QPointF, QRectF, QVariantAnimation, QAbstractAnimation, QTimer
 from PyQt5.QtGui import QColor, QPen, QBrush, QFont
 from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
                              QGraphicsView, QMainWindow, QGridLayout, QFrame,
-                             QSplitter, QWidget, QTextEdit, QVBoxLayout, QPushButton,
-                             QGraphicsItem, QHBoxLayout, QLabel, QLineEdit, QGridLayout)
+                             QSplitter, QWidget, QTextEdit, QVBoxLayout,
+                             QPushButton, QGraphicsItem, QHBoxLayout, QLabel,
+                             QLineEdit, QGridLayout)
 from functools import partial
 from read import recv
+
 
 class RectItem(QGraphicsRectItem):
     def __init__(self, rect=QRectF()):
@@ -104,29 +116,29 @@ class MainWindow(QMainWindow):
 
         btn_left = QPushButton("左转")
         btn_left.setFixedSize(100, 80)
-        left_layout.addWidget(btn_left, 1, 0)      
+        left_layout.addWidget(btn_left, 1, 0)
         btn_list.append(btn_left)
 
         btn_stop = QPushButton("停车")
         btn_stop.setFixedSize(100, 80)
-        left_layout.addWidget(btn_stop, 1, 1)      
+        left_layout.addWidget(btn_stop, 1, 1)
         btn_list.append(btn_stop)
 
         btn_right = QPushButton("右转")
         btn_right.setFixedSize(100, 80)
-        left_layout.addWidget(btn_right, 1, 2)      
+        left_layout.addWidget(btn_right, 1, 2)
         btn_list.append(btn_right)
 
         btn_back = QPushButton("后退")
         btn_back.setFixedSize(100, 80)
-        left_layout.addWidget(btn_back, 2, 1)      
+        left_layout.addWidget(btn_back, 2, 1)
         btn_list.append(btn_back)
 
         btn_slow = QPushButton("减速")
         btn_slow.setFixedSize(100, 80)
-        left_layout.addWidget(btn_slow, 2, 2)      
+        left_layout.addWidget(btn_slow, 2, 2)
         btn_list.append(btn_slow)
-                                                   
+
         pagelayout.addLayout(left_layout)
 
         # 右侧开始布局
@@ -140,7 +152,7 @@ class MainWindow(QMainWindow):
         self.left_line = QLineEdit()
         self.left_line.setFixedSize(88, 30)
         lineedit_list.append(self.left_line)
-        
+
         back_label = QLabel("后")
         back_label.setFixedSize(28, 30)
         label_list.append(back_label)
@@ -162,7 +174,6 @@ class MainWindow(QMainWindow):
         top_right_layout.addWidget(self.back_line)
         top_right_layout.addWidget(right_label)
         top_right_layout.addWidget(self.right_line)
-
 
         for label, line in zip(label_list, lineedit_list):
             label.setFont(font)
@@ -199,14 +210,16 @@ class MainWindow(QMainWindow):
         # ql.put(left)
         # qb.put(back)
         s = serial.Serial('COM6', 9600, timeout=0.5)  #/dev/ttyUSB0
-        if s.isOpen() :
+        if s.isOpen():
             print("open success")
-        else :
+        else:
             print("open failed")
 
+        # 发送一个数据激活
+        s.write('A'.encode())
         while True:
             data = recv(s)
-            if data != b'' :
+            if data != b'':
                 print("receive : ", data)
             # serial.write(data) #数据写回
         # if ql.qsize() == 1:

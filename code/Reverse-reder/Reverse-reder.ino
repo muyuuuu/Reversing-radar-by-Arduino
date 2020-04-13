@@ -1,7 +1,6 @@
 /*** 
  * @Author         : lanling
  * @Date           : 2020-03-29 19:11:35
- * @LastEditTime: 2020-04-12 17:56:25
  * @FilePath       : \Reverse-reder\Reverse-reder.ino
  * @Github         : https://github.com/muyuuuu
  * @Description    : 倒车雷达主程序
@@ -186,19 +185,20 @@ void loop()
 	// cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
 
 	// 串口输出距离
-	// str += "B";
-	// str += cmB;
-	// str += "R";
-	// str += cmR;
-	// str += "L";
-	// str += cmL;
-	str = "B123.2R87.2L123.1";
-	if (Serial.available() > 0) 
-	{
-		delay(500);
-		Serial.print(str);
-		delay(500);
-	}
-	delay(2000);
+	str += "B";
+	str += 123.2;
+	str += "R";
+	str += 87.2;
+	str += "L";
+	str += 12.1;
+	str += "O";
+
+	delay(500);
+	Serial.println(str);
+	// 发送完毕串口数据前都在等待
+	Serial.flush();
+	delay(500);
+
+	// delay(2000);
 	str = "";
 }

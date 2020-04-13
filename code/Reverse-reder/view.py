@@ -1,15 +1,17 @@
 ###
- # @Author         : lanling
- # @Date           : 2020-04-06 11:58:29
- # @LastEditTime: 2020-04-12 18:07:42
+# @Author         : lanling
+# @Date           : 2020-04-06 11:58:29
+ # @LastEditTime: 2020-04-13 23:08:35
  # @FilePath       : \Reverse-reder\view.py
- # @Github         : https://github.com/muyuuuu
- # @Description    : 
- # @佛祖保佑，永无BUG
+# @Github         : https://github.com/muyuuuu
+# @Description    :
+# @佛祖保佑，永无BUG
 ###
 
-import sys, time, random, queue, qdarkstyle, serial
-from PyQt5.QtCore import Qt, QPointF, QRectF, QVariantAnimation, QAbstractAnimation, QTimer
+import sys, time, random, queue, qdarkstyle, serial, threading
+from PyQt5.QtCore import (Qt, QPointF, QRectF, QVariantAnimation,
+                          QAbstractAnimation, QTimer, QObject, QThread,
+                          pyqtSignal)
 from PyQt5.QtGui import QColor, QPen, QBrush, QFont
 from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
                              QGraphicsView, QMainWindow, QGridLayout, QFrame,
@@ -70,6 +72,32 @@ class GraphicsView(QGraphicsView):
         self.setScene(self.scene)
 
 
+# 读取串口数据的类
+class Com(QThread):
+    my_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super(Com, self).__init__()
+        self.data = ""
+        self.is_on = True   # 1
+
+    def run(self):
+        while self.is_on:   # 2
+            s = serial.Serial(port='COM6',
+                                    baudrate=9600,
+                                    stopbits=serial.STOPBITS_ONE)
+
+            if s.isOpen():
+                print("open success")
+            else:
+                print("open failed")
+
+            while True:
+                self.data = recv(s)
+                self.my_signal.emit(str(self.data))    
+                self.sleep(1)
+
+# 主窗口的类
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -128,6 +156,11 @@ class MainWindow(QMainWindow):
         btn_right.setFixedSize(100, 80)
         left_layout.addWidget(btn_right, 1, 2)
         btn_list.append(btn_right)
+
+        exit_btn = QPushButton("退出")
+        exit_btn.setFixedSize(100, 80)
+        left_layout.addWidget(exit_btn, 2, 0)
+        btn_list.append(exit_btn)
 
         btn_back = QPushButton("后退")
         btn_back.setFixedSize(100, 80)
@@ -202,26 +235,22 @@ class MainWindow(QMainWindow):
 
         btn_start.clicked.connect(self.run)
 
-    def update(self):
+        exit_btn.clicked.connect(self.exit_)
+
+        self.com = Com()
+        self.com.my_signal.connect(self.run)
+
+    def exit_(self):
+        self.com.is_on = False
+
+    def update(self, distance):
+        pass
         # ql = queue.Queue(2)
         # left = int(self.item.x())
         # qb = queue.Queue(2)
         # back = int(self.item.y())
         # ql.put(left)
         # qb.put(back)
-        s = serial.Serial('COM6', 9600, timeout=0.5)  #/dev/ttyUSB0
-        if s.isOpen():
-            print("open success")
-        else:
-            print("open failed")
-
-        # 发送一个数据激活
-        s.write('A'.encode())
-        while True:
-            data = recv(s)
-            if data != b'':
-                print("receive : ", data)
-            # serial.write(data) #数据写回
         # if ql.qsize() == 1:
         #     self.left_line.setText(str(left))
         # else:
@@ -234,17 +263,22 @@ class MainWindow(QMainWindow):
         #         self.back_line.setText(str(100 - back))
 
     def move_pos(self, scene):
-        Left = [i for i in range(30, 50, 2)]
-        Center = [i for i in range(70, 80, 2)]
+        print(self.dis)   
+        Left = [i for i in range(30, 32, 2)]
+        Center = [i for i in range(32, 34, 2)]
         for it in scene.items():
             self.item = it
             for left, center in zip(Left, Center):
                 pos = QPointF(left, center)
                 if hasattr(it, 'move_smooth'):
-                    it.move_smooth(pos, 10000)
+                    it.move_smooth(pos, 500)
                     it._pos_animation.valueChanged.connect(self.update)
 
-    def run(self):
+    def run(self, distance):
+        # self.com.is_on = False
+        self.com.is_on = True
+        self.com.start()
+        self.dis = distance
         wrapper = partial(self.move_pos, self.scene)
         timer = QTimer(interval=5000, timeout=wrapper)
         timer.start()

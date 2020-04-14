@@ -1,12 +1,15 @@
-###
- # @Author         : lanling
- # @Date           : 2020-04-13 17:07:49
- # @LastEditTime   : 2020-04-13 22:31:25
- # @FilePath       : \Reverse-reder\test.py
- # @Github         : https://github.com/muyuuuu
- # @Description    : PyQt5 多线程测试
- # @佛祖保佑，永无BUG
-###
+'''
+File             : test.py
+Project          : Reverse-reder
+File Created     : Monday, 13th April 2020 5:07:49 pm
+Author           : lanling (https://github.com/muyuuuu)
+-----------
+Last Modified    : Monday, 13th April 2020 11:29:38 pm
+Modified By      : lanling (https://github.com/muyuuuu)
+Copyright 2020 - 2020 NCST, NCST
+-----------
+@ 佛祖保佑，永无BUG--
+'''
 
 import sys
 from PyQt5.QtCore import Qt, QThread, pyqtSignal

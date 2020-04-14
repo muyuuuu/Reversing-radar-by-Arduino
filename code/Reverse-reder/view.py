@@ -1,13 +1,15 @@
-###
-# @Author         : lanling
-# @Date           : 2020-04-06 11:58:29
- # @LastEditTime: 2020-04-13 23:08:35
- # @FilePath       : \Reverse-reder\view.py
-# @Github         : https://github.com/muyuuuu
-# @Description    :
-# @佛祖保佑，永无BUG
-###
-
+'''
+File: view.py
+Project: Reverse-reder
+File Created: Monday, 6th April 2020 11:58:29 am
+Author: lanling (https://github.com/muyuuuu)
+-----------
+Last Modified: Monday, 13th April 2020 11:25:58 pm
+Modified By: lanling (https://github.com/muyuuuu)
+Copyright 2020 - 2020 NCST, NCST
+-----------
+--佛祖保佑，永无BUG--
+'''
 import sys, time, random, queue, qdarkstyle, serial, threading
 from PyQt5.QtCore import (Qt, QPointF, QRectF, QVariantAnimation,
                           QAbstractAnimation, QTimer, QObject, QThread,

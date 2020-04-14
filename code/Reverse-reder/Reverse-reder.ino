@@ -1,10 +1,14 @@
-/*** 
- * @Author         : lanling
- * @Date           : 2020-03-29 19:11:35
- * @FilePath       : \Reverse-reder\Reverse-reder.ino
- * @Github         : https://github.com/muyuuuu
- * @Description    : 倒车雷达主程序
- * @佛祖保佑，永无BUG
+/*
+ * File: Reverse-reder.ino
+ * Project: Reverse-reder
+ * File Created: Sunday, 29th March 2020 7:11:35 pm
+ * Author: lanling (https://github.com/muyuuuu)
+ * -----------
+ * Last Modified: Monday, 13th April 2020 11:29:50 pm
+ * Modified By: lanling (https://github.com/muyuuuu)
+ * Copyright 2020 - 2020 NCST, NCST
+ * -----------
+ * @ 佛祖保佑，永无BUG--
  */
 
 // 后方超声波 ------------------------------------
@@ -157,40 +161,40 @@ void right()
 void loop()
 {
 	// forward();
-	// // 后方超声波开启 --------------------------------------------
-	// digitalWrite(trigBack, LOW);
-	// delayMicroseconds(5);
-	// digitalWrite(trigBack, HIGH);
-	// delayMicroseconds(10);
-	// digitalWrite(trigBack, LOW);
-	// // 计算后方超声波的距离
-	// cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
+	// 后方超声波开启 --------------------------------------------
+	digitalWrite(trigBack, LOW);
+	delayMicroseconds(5);
+	digitalWrite(trigBack, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(trigBack, LOW);
+	// 计算后方超声波的距离
+	cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
 
-	// // 右侧超声波开启 --------------------------------------------
-	// digitalWrite(trigRight, LOW);
-	// delayMicroseconds(5);
-	// digitalWrite(trigRight, HIGH);
-	// delayMicroseconds(10);
-	// digitalWrite(trigRight, LOW);
-	// // 计算后方超声波的距离
-	// cmR = (pulseIn(echoRight, HIGH) / 2) / 29.1;
+	// 右侧超声波开启 --------------------------------------------
+	digitalWrite(trigRight, LOW);
+	delayMicroseconds(5);
+	digitalWrite(trigRight, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(trigRight, LOW);
+	// 计算后方超声波的距离
+	cmR = (pulseIn(echoRight, HIGH) / 2) / 29.1;
 
-	// // 左侧超声波开启 --------------------------------------------
-	// digitalWrite(trigLeft, LOW);
-	// delayMicroseconds(5);
-	// digitalWrite(trigLeft, HIGH);
-	// delayMicroseconds(10);
-	// digitalWrite(trigLeft, LOW);
-	// // 计算后方超声波的距离
-	// cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
+	// 左侧超声波开启 --------------------------------------------
+	digitalWrite(trigLeft, LOW);
+	delayMicroseconds(5);
+	digitalWrite(trigLeft, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(trigLeft, LOW);
+	// 计算后方超声波的距离
+	cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
 
 	// 串口输出距离
 	str += "B";
-	str += 123.2;
+	str += cmB;
 	str += "R";
-	str += 87.2;
+	str += cmR;
 	str += "L";
-	str += 12.1;
+	str += cmL;
 	str += "O";
 
 	delay(500);

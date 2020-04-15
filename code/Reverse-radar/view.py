@@ -10,6 +10,7 @@ Copyright 2020 - 2020 NCST, NCST
 -----------
 --佛祖保佑，永无BUG--
 '''
+
 import sys, time, random, queue, qdarkstyle, serial, threading
 from PyQt5.QtCore import (Qt, QPointF, QRectF, QVariantAnimation,
                           QAbstractAnimation, QTimer, QObject, QThread,
@@ -21,7 +22,6 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
                              QPushButton, QGraphicsItem, QHBoxLayout, QLabel,
                              QLineEdit, QGridLayout)
 from functools import partial
-from read import recv
 
 
 class RectItem(QGraphicsRectItem):
@@ -82,22 +82,49 @@ class Com(QThread):
         super(Com, self).__init__()
         self.data = ""
         self.is_on = True   # 1
+        self.s = serial.Serial(port='COM6',
+                                baudrate=9600,
+                                stopbits=serial.STOPBITS_ONE)
+
+    def recv(self, serial):
+        while True:
+            self.sleep(1)
+            data = serial.read_all()
+            if data == '':
+                continue
+            else:
+                break
+        return data
 
     def run(self):
         while self.is_on:   # 2
-            s = serial.Serial(port='COM6',
-                                    baudrate=9600,
-                                    stopbits=serial.STOPBITS_ONE)
-
-            if s.isOpen():
+            if self.s.isOpen():
                 print("open success")
             else:
                 print("open failed")
 
             while True:
-                self.data = recv(s)
+                self.data = self.recv(self.s)
                 self.my_signal.emit(str(self.data))    
-                self.sleep(1)
+
+    def stop(self):
+        self.s.write('S'.encode('utf-8'))
+
+    def forward(self):
+        self.s.write('F'.encode('utf-8'))
+
+    def back(self):
+        self.s.write('B'.encode('utf-8'))
+
+    def left(self):
+        self.s.write('L'.encode('utf-8'))
+
+    def right(self):
+        self.s.write('R'.encode('utf-8'))
+
+    def begin(self):
+        self.s.write('E'.encode('utf-8'))
+
 
 # 主窗口的类
 class MainWindow(QMainWindow):
@@ -242,6 +269,28 @@ class MainWindow(QMainWindow):
         self.com = Com()
         self.com.my_signal.connect(self.run)
 
+        # 将按钮与发送数据相关联
+        btn_stop.clicked.connect(self.stop)
+        btn_left.clicked.connect(self.left)
+        btn_right.clicked.connect(self.right)
+        btn_forward.clicked.connect(self.forward)
+        btn_back.clicked.connect(self.back)
+
+    def back(self):
+        self.com.back()
+
+    def left(self):
+        self.com.left()
+
+    def right(self):
+        self.com.right()
+
+    def stop(self):
+        self.com.stop()
+
+    def forward(self):
+        self.com.forward()
+
     def exit_(self):
         self.com.is_on = False
 
@@ -277,8 +326,6 @@ class MainWindow(QMainWindow):
                     it._pos_animation.valueChanged.connect(self.update)
 
     def run(self, distance):
-        # self.com.is_on = False
-        self.com.is_on = True
         self.com.start()
         self.dis = distance
         wrapper = partial(self.move_pos, self.scene)

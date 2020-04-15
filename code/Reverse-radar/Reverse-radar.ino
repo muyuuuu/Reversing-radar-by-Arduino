@@ -76,18 +76,18 @@ void setup() {
 // 前进函数 ------------------------------------------
 void forward()
 {
-	// 左前轮
+	// 右前轮
 	digitalWrite(input1, LOW); 
 	digitalWrite(input2, HIGH);  
-	// 右前轮 
-	digitalWrite(input3, LOW); 
-	digitalWrite(input4, HIGH);
 	// 右后轮
 	digitalWrite(input5, HIGH);
 	digitalWrite(input6, LOW);
 	// 左后轮
 	digitalWrite(input7, HIGH);
 	digitalWrite(input8, LOW);
+	// 左前轮 
+	digitalWrite(input3, LOW); 
+	digitalWrite(input4, HIGH);
 }
 
 // 停止函数 ------------------------------------------
@@ -96,71 +96,109 @@ void stop()
 	// 左前轮
 	digitalWrite(input1, LOW); 
 	digitalWrite(input2, LOW);  
+	// 左后轮
+	digitalWrite(input7, LOW);
+	digitalWrite(input8, LOW);
 	// 右前轮 
 	digitalWrite(input3, LOW); 
 	digitalWrite(input4, LOW);
 	// 右后轮
 	digitalWrite(input5, LOW);
 	digitalWrite(input6, LOW);
-	// 左后轮
-	digitalWrite(input7, LOW);
-	digitalWrite(input8, LOW);
 }
 
 // 后退函数 ------------------------------------------
 void back()
 {
-	// 左前轮
+	// 右前轮
 	digitalWrite(input1, HIGH); 
 	digitalWrite(input2, LOW);  
-	// 右前轮 
-	digitalWrite(input3, HIGH); 
-	digitalWrite(input4, LOW);
 	// 右后轮
 	digitalWrite(input5, LOW);
 	digitalWrite(input6, HIGH);
 	// 左后轮
 	digitalWrite(input7, LOW);
 	digitalWrite(input8, HIGH);
+	// 左前轮 
+	digitalWrite(input3, HIGH); 
+	digitalWrite(input4, LOW);
 }
 
 // 左转函数 ------------------------------------------
 void left()
 {
-	// 左前轮
-	digitalWrite(input1, LOW); 
-	digitalWrite(input2, HIGH);  
 	// 左后轮
-	digitalWrite(input7, HIGH);
-	digitalWrite(input8, LOW);
-	// 右前轮 
+	digitalWrite(input7, LOW);
+	digitalWrite(input8, HIGH);
+	// 左前轮 
 	digitalWrite(input3, HIGH); 
 	digitalWrite(input4, LOW);
+	// 右前轮
+	digitalWrite(input1, LOW); 
+	digitalWrite(input2, HIGH);  
 	// 右后轮
-	digitalWrite(input5, LOW);
-	digitalWrite(input6, HIGH);
+	digitalWrite(input5, HIGH);
+	digitalWrite(input6, LOW);
 }
 
 // 右转函数 ------------------------------------------
 void right()
 {
-	// 右前轮 
+	// 左后轮
+	digitalWrite(input7, HIGH);
+	digitalWrite(input8, LOW);
+	// 左前轮 
 	digitalWrite(input3, LOW); 
 	digitalWrite(input4, HIGH);
-	// 右后轮
-	digitalWrite(input5, HIGH);
-	digitalWrite(input6, LOW);
-	// 左前轮
+	// 右前轮
 	digitalWrite(input1, HIGH); 
 	digitalWrite(input2, LOW);  
-	// 左后轮
-	digitalWrite(input7, LOW);
-	digitalWrite(input8, HIGH);
+	// 右后轮
+	digitalWrite(input5, LOW);
+	digitalWrite(input6, HIGH);
 }
 
 void loop()
 {
-	// forward();
+	// 读取串口数据
+	if (Serial.available() > 0)
+	{ 
+		str = Serial.readString();
+		// 将读来的数据发送
+		if (str == "S")
+		{
+			stop();
+		}
+		if (str == "F")
+		{
+			stop();
+			delay(50);
+			forward();
+		}
+		if (str == "B")
+		{
+			stop();
+			delay(50);
+			back();
+		}
+		if (str == "L")
+		{
+			stop();
+			delay(50);
+			left();
+		}
+		if (str == "R")
+		{
+			stop();
+			delay(50);
+			right();
+		}
+		delay(50);
+		// 清空入口缓存
+		while(Serial.available())
+			Serial.read();
+	}
+
 	// 后方超声波开启 --------------------------------------------
 	digitalWrite(trigBack, LOW);
 	delayMicroseconds(5);
@@ -188,20 +226,26 @@ void loop()
 	// 计算后方超声波的距离
 	cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
 
-	// 串口输出距离
-	str += "B";
-	str += cmB;
-	str += "R";
-	str += cmR;
-	str += "L";
-	str += cmL;
-	str += "O";
+	if (cmB < 5)
+	{
+		stop();
+	}
 
-	delay(500);
-	Serial.println(str);
-	// 发送完毕串口数据前都在等待
-	Serial.flush();
-	delay(500);
+	// 串口输出距离
+	// str += "B";
+	// str += cmB;
+	// str += "R";
+	// str += cmR;
+	// str += "L";
+	// str += cmL;
+	// str += "O";
+	// 当串口接收到信息后
+
+	// delay(500);
+	// Serial.println(str);
+	// // 发送完毕串口数据前都在等待
+	// Serial.flush();
+	// delay(500);
 
 	// delay(2000);
 	str = "";

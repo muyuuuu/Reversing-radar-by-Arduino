@@ -10,14 +10,3 @@ Copyright 2020 - 2020 NCST, NCST
 -----------
 --佛祖保佑，永无BUG--
 '''
-import serial, time
-
-
-def recv(serial):
-    while True:
-        data = serial.read_all()
-        if data == '':
-            continue
-        else:
-            break
-    return data

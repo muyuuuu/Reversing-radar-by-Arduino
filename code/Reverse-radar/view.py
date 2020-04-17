@@ -314,7 +314,7 @@ class MainWindow(QMainWindow):
         #         self.back_line.setText(str(100 - back))
 
     def move_pos(self, scene):
-        print(self.dis)   
+        print(self.dis)
         Left = [i for i in range(30, 32, 2)]
         Center = [i for i in range(32, 34, 2)]
         for it in scene.items():
@@ -326,6 +326,7 @@ class MainWindow(QMainWindow):
                     it._pos_animation.valueChanged.connect(self.update)
 
     def run(self, distance):
+        # 线程开始执行
         self.com.start()
         self.dis = distance
         wrapper = partial(self.move_pos, self.scene)

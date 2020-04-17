@@ -15,50 +15,57 @@
 int trigBack = 13;
 int echoBack = A0;
 // 右侧超声波 ------------------------------------
-int trigRight = 8;
-int echoRight = A1;
+// int trigRight = 8;
+// int echoRight = A1;
 // 左侧超声波 ------------------------------------
-int trigLeft = 2;
-int echoLeft = A2;
+// int trigLeft = 2;
+// int echoLeft = A2;
+// 定义两个电机驱动的使能端
+int en1 = 9;
+int en2 = 6;
 // 右前轮 -----------------------------------------
-// 定义 uno 的 pin 11 向 input1 输出
-int input1 = 9; 
+// 定义 uno 的 pin 8 向 input1 输出
+int input1 = 8; 
 // 定义 uno 的 pin 12 向 input2 输出
 int input2 = 10; 
 // 左前轮 -----------------------------------------
-// 定义 uno 的 pin 9 向 input3 输出
+// 定义 uno 的 pin 11 向 input3 输出
 int input3 = 11; 
-// 定义 uno 的 pin 10 向 input4 输出
+// 定义 uno 的 pin 12 向 input4 输出
 int input4 = 12; 
 // 右后轮 -----------------------------------------
-// 定义 uno 的 pin 11 向 input1 输出
+// 定义 uno 的 pin 3 向 input5 输出
 int input5 = 3; 
-// 定义 uno 的 pin 12 向 input2 输出
+// 定义 uno 的 pin 4 向 input6 输出
 int input6 = 4; 
 // 左后轮 -----------------------------------------
-// 定义 uno 的 pin 9 向 input3 输出
+// 定义 uno 的 pin 5 向 input7 输出
 int input7 = 5; 
-// 定义 uno 的 pin 10 向 input4 输出
-int input8 = 6; 
+// 定义 uno 的 pin 6 向 input8 输出
+int input8 = 7; 
 // 设置蓝牙的连接 -----------------------------------
 String str = "";
 // 后侧超声波
 long cmB, cmR, cmL;
+int speed = 80;
 
-void setup() {
+void setup() 
+{
 	// 设置硬件串口通信的波特率
 	Serial.begin(9600);
 	// 定义后侧超声波的输入输出模式 -----------------------------
 	pinMode(trigBack, OUTPUT);
 	pinMode(echoBack, INPUT);
 	// 定义右侧超声波的输入输出模式 -----------------------------
-  	pinMode(trigRight, OUTPUT);
-  	pinMode(echoRight, INPUT); 
+  	// pinMode(trigRight, OUTPUT);
+  	// pinMode(echoRight, INPUT); 
 	// 定义左侧超声波的输入输出模式 -----------------------------
-  	pinMode(trigLeft, OUTPUT);
-	  
-  	pinMode(echoLeft, INPUT); 	  
+  	// pinMode(trigLeft, OUTPUT);
+  	// pinMode(echoLeft, INPUT); 	  
 	// 定义所有的电机均为输出模式 ------------------------------
+	// 使能端
+	pinMode(en1, OUTPUT);
+	pinMode(en2, OUTPUT);
 	// 右前
 	pinMode(input1, OUTPUT);
 	pinMode(input2, OUTPUT);
@@ -71,11 +78,18 @@ void setup() {
 	// 左后  
 	pinMode(input7, OUTPUT);
 	pinMode(input8, OUTPUT);
+	// 测试灯
+	pinMode(LED_BUILTIN, OUTPUT);
+	// 清空串口缓存
+	while(Serial.available())
+		Serial.read();
 }
 
 // 前进函数 ------------------------------------------
 void forward()
 {
+	analogWrite(en1, speed);
+	analogWrite(en2, speed);
 	// 右前轮
 	digitalWrite(input1, LOW); 
 	digitalWrite(input2, HIGH);  
@@ -110,6 +124,8 @@ void stop()
 // 后退函数 ------------------------------------------
 void back()
 {
+	analogWrite(en1, speed);
+	analogWrite(en2, speed);
 	// 右前轮
 	digitalWrite(input1, HIGH); 
 	digitalWrite(input2, LOW);  
@@ -127,6 +143,8 @@ void back()
 // 左转函数 ------------------------------------------
 void left()
 {
+	analogWrite(en1, speed);
+	analogWrite(en2, speed);
 	// 左后轮
 	digitalWrite(input7, LOW);
 	digitalWrite(input8, HIGH);
@@ -144,6 +162,8 @@ void left()
 // 右转函数 ------------------------------------------
 void right()
 {
+	analogWrite(en1, speed);
+	analogWrite(en2, speed);
 	// 左后轮
 	digitalWrite(input7, HIGH);
 	digitalWrite(input8, LOW);
@@ -163,6 +183,7 @@ void loop()
 	// 读取串口数据
 	if (Serial.available() > 0)
 	{ 
+		delay(50);
 		str = Serial.readString();
 		// 将读来的数据发送
 		if (str == "S")
@@ -171,34 +192,29 @@ void loop()
 		}
 		if (str == "F")
 		{
-			stop();
 			delay(50);
 			forward();
 		}
 		if (str == "B")
 		{
-			stop();
 			delay(50);
 			back();
 		}
 		if (str == "L")
 		{
-			stop();
 			delay(50);
 			left();
 		}
 		if (str == "R")
 		{
-			stop();
 			delay(50);
 			right();
 		}
 		delay(50);
-		// 清空入口缓存
-		while(Serial.available())
-			Serial.read();
 	}
-
+	// 清空入口缓存
+	while(Serial.available())
+		Serial.read();
 	// 后方超声波开启 --------------------------------------------
 	digitalWrite(trigBack, LOW);
 	delayMicroseconds(5);
@@ -209,31 +225,31 @@ void loop()
 	cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
 
 	// 右侧超声波开启 --------------------------------------------
-	digitalWrite(trigRight, LOW);
-	delayMicroseconds(5);
-	digitalWrite(trigRight, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(trigRight, LOW);
+	// digitalWrite(trigRight, LOW);
+	// delayMicroseconds(5);
+	// digitalWrite(trigRight, HIGH);
+	// delayMicroseconds(10);
+	// digitalWrite(trigRight, LOW);
 	// 计算后方超声波的距离
-	cmR = (pulseIn(echoRight, HIGH) / 2) / 29.1;
+	// cmR = (pulseIn(echoRight, HIGH) / 2) / 29.1;
 
 	// 左侧超声波开启 --------------------------------------------
-	digitalWrite(trigLeft, LOW);
-	delayMicroseconds(5);
-	digitalWrite(trigLeft, HIGH);
-	delayMicroseconds(10);
-	digitalWrite(trigLeft, LOW);
+	// digitalWrite(trigLeft, LOW);
+	// delayMicroseconds(5);
+	// digitalWrite(trigLeft, HIGH);
+	// delayMicroseconds(10);
+	// digitalWrite(trigLeft, LOW);
 	// 计算后方超声波的距离
-	cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
+	// cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
 
-	if (cmB < 5)
+	if (cmB < 3)
 	{
 		stop();
 	}
 
 	// 串口输出距离
 	// str += "B";
-	// str += cmB;
+	str += cmB;
 	// str += "R";
 	// str += cmR;
 	// str += "L";
@@ -241,12 +257,12 @@ void loop()
 	// str += "O";
 	// 当串口接收到信息后
 
-	// delay(500);
-	// Serial.println(str);
-	// // 发送完毕串口数据前都在等待
-	// Serial.flush();
-	// delay(500);
+	delay(500);
+	Serial.println(cmB);
+	//  发送完毕串口数据前都在等待
+	Serial.flush();
+	delay(500);
 
-	// delay(2000);
+	// // delay(2000);
 	str = "";
 }

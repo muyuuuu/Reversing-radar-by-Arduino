@@ -191,6 +191,10 @@ void loop()
 		{
 			flag = 1;
 		}
+        if (val == '6')
+        {
+            flag = 0;
+        }
 		if (val == '2')
 		{
 			stop();
@@ -233,28 +237,30 @@ void loop()
 	// digitalWrite(trigLeft, LOW);
 	// 计算后方超声波的距离
 	// cmL = (pulseIn(echoLeft, HIGH) / 2) / 29.1;
-	if (flag == 1)
-	{
-		// 后方超声波开启 --------------------------------------------
-		digitalWrite(trigBack, LOW);
-		delayMicroseconds(5);
-		digitalWrite(trigBack, HIGH);
-		delayMicroseconds(20);
-		digitalWrite(trigBack, LOW);
-		// 计算后方超声波的距离
-		cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
-		if (cmB < 3)
-		{
-			stop();
-		}
-		Serial.println(cmB);
-		//  发送完毕串口数据前都在等待
-		// Serial.flush();
-		// while(Serial.available())
-			// Serial.read();
-		delay(1000);
-		// 清空串口缓存
-	}
+    Serial.println(flag);
+    delay(1000);
+	// if (flag == 1)
+	// {
+	// 	// 后方超声波开启 --------------------------------------------
+	// 	digitalWrite(trigBack, LOW);
+	// 	delayMicroseconds(5);
+	// 	digitalWrite(trigBack, HIGH);
+	// 	delayMicroseconds(20);
+	// 	digitalWrite(trigBack, LOW);
+	// 	// 计算后方超声波的距离
+	// 	cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
+	// 	if (cmB < 3)
+	// 	{
+	// 		stop();
+	// 	}
+	// 	Serial.println(cmB);
+	// 	//  发送完毕串口数据前都在等待
+	// 	// Serial.flush();
+	// 	// while(Serial.available())
+	// 		// Serial.read();
+	// 	delay(1000);
+	// 	// 清空串口缓存
+	// }
 	// 串口输出距离
 	// str += "B";
 	// str += "R";

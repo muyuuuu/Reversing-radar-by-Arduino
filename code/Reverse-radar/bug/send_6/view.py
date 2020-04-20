@@ -24,56 +24,6 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
 from functools import partial
 
 
-class RectItem(QGraphicsRectItem):
-    def __init__(self, rect=QRectF()):
-        super(RectItem, self).__init__(rect)
-        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        self._pos_animation = QVariantAnimation()
-        self._pos_animation.valueChanged.connect(self.setPos)
-
-    def move_smooth(self, end, duration):
-        if self._pos_animation.state() == QAbstractAnimation.Running:
-            self._pos_animation.stop()
-        self._pos_animation.setDuration(duration)
-        self._pos_animation.setStartValue(self.pos())
-        self._pos_animation.setEndValue(end)
-        self._pos_animation.start()
-
-
-# 负责绘制车辆的类
-class GraphicsView(QGraphicsView):
-    def __init__(self):
-        super(GraphicsView, self).__init__()
-
-        # 创建图形容器
-
-        self.setFixedSize(460, 560)
-
-        # 将车库实体化为 宽度450 长度600 大小
-        self.scene = QGraphicsScene()
-        self.scene.setSceneRect(0, 0, 450, 550)
-
-        # 创建车辆实例
-        self.rect = RectItem()
-
-        # 初始化位置为 30 30 车辆宽度 250 长度 400
-        self.rect.setRect(0, 0, 240, 300)
-
-        # 创建颜色刷子
-        brush1 = QBrush(Qt.SolidPattern)
-        brush1.setColor(QColor(124, 214, 175))
-
-        # 给车身上色
-        self.rect.setBrush(brush1)
-
-        # 将车身添加到容器中 即放到车库里
-        self.scene.addItem(self.rect)
-
-        # 设置当前场景
-        self.setScene(self.scene)
-
-
 # 读取串口数据的类
 class Com(QThread):
     my_signal = pyqtSignal(str)
@@ -124,6 +74,9 @@ class Com(QThread):
 
     def begin(self):
         self.s.write(b"5")
+
+    def lift_exit(self):
+        self.s.write(b"6")
 
 
 # 主窗口的类
@@ -181,10 +134,10 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(btn_right, 1, 2)
         btn_list.append(btn_right)
 
-        # exit_btn = QPushButton("退出")
-        # exit_btn.setFixedSize(100, 80)
-        # left_layout.addWidget(exit_btn, 0, 2)
-        # btn_list.append(exit_btn)
+        exit_btn = QPushButton("退出")
+        exit_btn.setFixedSize(100, 80)
+        left_layout.addWidget(exit_btn, 0, 2)
+        btn_list.append(exit_btn)
 
         btn_back = QPushButton("后退")
         btn_back.setFixedSize(100, 80)
@@ -198,40 +151,6 @@ class MainWindow(QMainWindow):
 
         pagelayout.addLayout(left_layout)
 
-        # 右侧开始布局
-        right_layout = QVBoxLayout()
-
-        # 右上侧开始布局 ----------------------------------------------
-        # 创建左侧的文本编辑器  用于显示距离数字
-        left_label = QLabel("左")
-        left_label.setFixedSize(28, 30)
-        label_list.append(left_label)
-        self.left_line = QLineEdit()
-        self.left_line.setFixedSize(88, 30)
-        lineedit_list.append(self.left_line)
-
-        back_label = QLabel("后")
-        back_label.setFixedSize(28, 30)
-        label_list.append(back_label)
-        self.back_line = QLineEdit()
-        self.back_line.setFixedSize(88, 30)
-        lineedit_list.append(self.back_line)
-
-        right_label = QLabel("右")
-        right_label.setFixedSize(28, 30)
-        label_list.append(right_label)
-        self.right_line = QLineEdit()
-        self.right_line.setFixedSize(88, 30)
-        lineedit_list.append(self.right_line)
-
-        top_right_layout = QHBoxLayout()
-        top_right_layout.addWidget(left_label)
-        top_right_layout.addWidget(self.left_line)
-        top_right_layout.addWidget(back_label)
-        top_right_layout.addWidget(self.back_line)
-        top_right_layout.addWidget(right_label)
-        top_right_layout.addWidget(self.right_line)
-
         for label, line in zip(label_list, lineedit_list):
             label.setFont(font)
             line.setFont(font)
@@ -239,17 +158,6 @@ class MainWindow(QMainWindow):
         for btn in btn_list:
             btn.setFont(font)
 
-        # 右侧开始布局 ----------------------------------------------
-        #　添加右侧的倒车情景
-        g = GraphicsView()
-        # g.setFixedSize(450, 550)
-        self.car = g.rect
-        self.scene = g.scene
-
-        # print(self.scene.x())
-        right_layout.addLayout(top_right_layout)
-        right_layout.addWidget(g)
-        pagelayout.addLayout(right_layout)
 
         # 设置最终的窗口布局与控件-------------------------------------
         widget = QWidget()
@@ -257,7 +165,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
+        btn_start.clicked.connect(self.test_)
         btn_start.clicked.connect(self.run)
+        exit_btn.clicked.connect(self.lift_run)
 
         self.com = Com()
         self.com.my_signal.connect(self.run)
@@ -270,66 +180,38 @@ class MainWindow(QMainWindow):
         btn_back.clicked.connect(self.back)
 
         self.flag = 0
+        self.flag1 = 0
         self.dis = 0
+        self.com.start()
+        
+    def lift_run(self):
+        self.com.lift_exit()
 
     def back(self):
-        self.com.back()
+        pass
 
     def left(self):
-        self.com.left()
+        pass
 
     def right(self):
-        self.com.right()
+        pass
 
     def stop(self):
-        self.com.stop()
+        pass
 
     def forward(self):
-        self.com.forward()
-
-    def update(self, distance):
         pass
-        # ql = queue.Queue(2)
-        # left = int(self.item.x())
-        # qb = queue.Queue(2)
-        # back = int(self.item.y())
-        # ql.put(left)
-        # qb.put(back)
-        # if ql.qsize() == 1:
-        #     self.left_line.setText(str(left))
-        # else:
-        #     if left - ql.get() > 1:
-        #         self.left_line.setText(str(left))
-        # if qb.qsize() == 1:
-        #     self.back_line.setText(str(100 - back))
-        # else:
-        #     if back - qb.get() > 1:
-        #         self.back_line.setText(str(100 - back))
 
-    def move_pos(self, scene):
-        print(self.dis)
-        Left = [i for i in range(30, 32, 2)]
-        Center = [i for i in range(32, 34, 2)]
-        for it in scene.items():
-            self.item = it
-            for left, center in zip(Left, Center):
-                pos = QPointF(left, center)
-                if hasattr(it, 'move_smooth'):
-                    it.move_smooth(pos, 500)
-                    it._pos_animation.valueChanged.connect(self.update)
+    def test_(self):
+        if (self.flag == 1):
+            self.flag = 0
 
-    def run(self, distance):
-        self.com.begin()
-        # 数据线程开始执行
-        if self.flag == 0:
-            self.com.start()
-            self.flag += 1
-        self.dis = distance
-        wrapper = partial(self.move_pos, self.scene)
-        timer = QTimer(interval=5000, timeout=wrapper)
-        timer.start()
-        wrapper()
-
+    def run(self, data):
+        print(data)
+        if (self.flag == 0):
+            self.com.begin()
+            self.flag = 1
+            
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -10,16 +10,16 @@ Copyright 2020 - 2020 NCST, NCST
 -----------
 @ 佛祖保佑，永无BUG--
 '''
-import sys, time, random, queue, qdarkstyle, serial, threading
+import sys, time, random, queue, qdarkstyle, serial, threading, math
 from PyQt5.QtCore import (Qt, QPointF, QRectF, QVariantAnimation,
                           QAbstractAnimation, QTimer, QObject, QThread,
                           pyqtSignal)
-from PyQt5.QtGui import QColor, QPen, QBrush, QFont
+from PyQt5.QtGui import QColor, QPen, QBrush, QFont, QTransform
 from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
                              QGraphicsView, QMainWindow, QGridLayout, QFrame,
                              QSplitter, QWidget, QTextEdit, QVBoxLayout,
                              QPushButton, QGraphicsItem, QHBoxLayout, QLabel,
-                             QLineEdit, QGridLayout)
+                             QLineEdit, QGridLayout, QGraphicsTransform)
 from functools import partial
 
 
@@ -86,8 +86,13 @@ class MainWindow(QMainWindow):
         btn_start.setFixedSize(100, 80)
         left_layout.addWidget(btn_start, 0, 0)
 
-        btn_rorate = QPushButton("旋转")
+        btn_rorate = QPushButton("左转")
         btn_rorate.setFixedSize(100, 80)
+
+        btn_rorate1 = QPushButton("右转")
+        btn_rorate1.setFixedSize(100, 80)
+
+        left_layout.addWidget(btn_rorate1, 2, 0)
         left_layout.addWidget(btn_rorate, 1, 0)
 
         # 右侧开始布局
@@ -112,34 +117,38 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
         btn_start.clicked.connect(self.run)
-        btn_rorate.clicked.connect(self.run1)
+        btn_rorate.clicked.connect(self.rorate_left)
+        btn_rorate1.clicked.connect(self.rorate_right)
 
-        self.angle = 10
+        self.angle_left = 5
+        self.angle_right = 5
 
-    # 只能旋转一次？
-    def rorate(self, scene):
-        # 设置旋转点
-        # self.car.setTransformOriginPoint(QPointF(240, 0))
-        # 
-            # for ang in range(0, 30):
-        self.car.setRotation(self.angle)
-        self.angle += 10
+    # 以车辆中心为旋转点
+    def rorate_right(self):
+        pos = self.car.scenePos()
+        x = pos.x() + 120
+        y = pos.y() + 120
+        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setRotation(self.angle_right)
+        self.angle_right += 5
+
+    def rorate_left(self):
+        pos = self.car.scenePos()
+        x = pos.x()
+        y = pos.y()
+        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setRotation(self.angle_left)
+        self.angle_left += 5
 
     def move_pos(self, scene):
         Left = [i for i in range(0, 40, 2)]
-        Center = [i for i in range(0, 42, 2)]
+        Center = [i for i in range(0, 40, 2)]
         for it in scene.items():
             self.item = it
             for left, center in zip(Left, Center):
                 pos = QPointF(left, center)
                 if hasattr(it, 'move_smooth'):
                     it.move_smooth(pos, 500)
-
-    def run1(self, distance):
-        wrapper = partial(self.rorate, self.scene)
-        timer = QTimer(interval=5000, timeout=wrapper)
-        timer.start()
-        wrapper()
 
     def run(self, distance):
         wrapper = partial(self.move_pos, self.scene)

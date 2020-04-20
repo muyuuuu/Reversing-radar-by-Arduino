@@ -191,6 +191,10 @@ void loop()
 		{
 			flag = 1;
 		}
+		if (val == '6')
+		{
+			flag = 0;
+		}
 		if (val == '2')
 		{
 			stop();
@@ -239,11 +243,11 @@ void loop()
 		digitalWrite(trigBack, LOW);
 		delayMicroseconds(5);
 		digitalWrite(trigBack, HIGH);
-		delayMicroseconds(20);
+		delayMicroseconds(10);
 		digitalWrite(trigBack, LOW);
 		// 计算后方超声波的距离
 		cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
-		if (cmB < 3)
+		if (cmB < 5)
 		{
 			stop();
 		}

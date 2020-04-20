@@ -125,6 +125,9 @@ class Com(QThread):
     def begin(self):
         self.s.write(b"5")
 
+    def lift(self):
+        self.s.write(b"6")
+
 
 # 主窗口的类
 class MainWindow(QMainWindow):
@@ -158,7 +161,7 @@ class MainWindow(QMainWindow):
 
         btn_start = QPushButton("倒车")
         btn_start.setFixedSize(100, 80)
-        left_layout.addWidget(btn_start, 3, 1)
+        left_layout.addWidget(btn_start, 0, 0)
         btn_list.append(btn_start)
 
         btn_forward = QPushButton("前进")
@@ -181,10 +184,10 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(btn_right, 1, 2)
         btn_list.append(btn_right)
 
-        # exit_btn = QPushButton("退出")
-        # exit_btn.setFixedSize(100, 80)
-        # left_layout.addWidget(exit_btn, 0, 2)
-        # btn_list.append(exit_btn)
+        exit_btn = QPushButton("退出")
+        exit_btn.setFixedSize(100, 80)
+        left_layout.addWidget(exit_btn, 0, 2)
+        btn_list.append(exit_btn)
 
         btn_back = QPushButton("后退")
         btn_back.setFixedSize(100, 80)
@@ -257,7 +260,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
+        btn_start.clicked.connect(self.update_begin)
         btn_start.clicked.connect(self.run)
+        exit_btn.clicked.connect(self.lift)
 
         self.com = Com()
         self.com.my_signal.connect(self.run)
@@ -271,6 +276,10 @@ class MainWindow(QMainWindow):
 
         self.flag = 0
         self.dis = 0
+        self.flag1 = 0
+
+    def lift(self):
+        self.com.lift()
 
     def back(self):
         self.com.back()
@@ -318,8 +327,15 @@ class MainWindow(QMainWindow):
                     it.move_smooth(pos, 500)
                     it._pos_animation.valueChanged.connect(self.update)
 
+    # 确定是按钮按下 而不是多线程发来的信号
+    def update_begin(self):
+        if self.flag1 == 1:
+            self.flag1 = 0
+
     def run(self, distance):
-        self.com.begin()
+        if self.flag1 == 0:
+            self.com.begin()
+            self.flag1 = 1
         # 数据线程开始执行
         if self.flag == 0:
             self.com.start()

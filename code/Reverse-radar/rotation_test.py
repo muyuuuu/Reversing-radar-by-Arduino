@@ -127,18 +127,20 @@ class MainWindow(QMainWindow):
     def rorate_right(self):
         pos = self.car.scenePos()
         x = pos.x() + 120
-        y = pos.y() + 120
+        y = pos.y() + 150
         self.car.setTransformOriginPoint(QPointF(x, y))
-        self.car.setRotation(self.angle_right)
+        self.car.setRotation(360 - self.angle_right)
         self.angle_right += 5
+        self.angle_left -= 5
 
     def rorate_left(self):
         pos = self.car.scenePos()
-        x = pos.x()
-        y = pos.y()
+        x = pos.x() + 120
+        y = pos.y() + 150
         self.car.setTransformOriginPoint(QPointF(x, y))
         self.car.setRotation(self.angle_left)
         self.angle_left += 5
+        self.angle_right -= 5
 
     def move_pos(self, scene):
         Left = [i for i in range(0, 40, 2)]

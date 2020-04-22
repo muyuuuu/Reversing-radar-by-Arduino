@@ -43,7 +43,7 @@ class RectItem(QGraphicsRectItem):
 
 # 负责绘制车辆的类
 class GraphicsView(QGraphicsView):
-    def __init__(self):
+    def __init__(self, width, height):
         super(GraphicsView, self).__init__()
 
         # 创建图形容器
@@ -58,7 +58,7 @@ class GraphicsView(QGraphicsView):
         self.rect = RectItem()
 
         # 初始化位置为 30 30 车辆宽度 250 长度 400
-        self.rect.setRect(0, 0, 240, 300)
+        self.rect.setRect((450 - width) / 2, 0, width, height)
 
         # 创建颜色刷子
         brush1 = QBrush(Qt.SolidPattern)
@@ -194,11 +194,6 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(btn_back, 2, 1)
         btn_list.append(btn_back)
 
-        # btn_slow = QPushButton("减速")
-        # btn_slow.setFixedSize(100, 80)
-        # left_layout.addWidget(btn_slow, 2, 2)
-        # btn_list.append(btn_slow)
-
         pagelayout.addLayout(left_layout)
 
         # 右侧开始布局
@@ -206,34 +201,17 @@ class MainWindow(QMainWindow):
 
         # 右上侧开始布局 ----------------------------------------------
         # 创建左侧的文本编辑器  用于显示距离数字
-        left_label = QLabel("左")
-        left_label.setFixedSize(28, 30)
-        label_list.append(left_label)
-        self.left_line = QLineEdit()
-        self.left_line.setFixedSize(88, 30)
-        lineedit_list.append(self.left_line)
 
-        back_label = QLabel("后")
-        back_label.setFixedSize(28, 30)
+        back_label = QLabel("后方距离")
+        back_label.setFixedSize(90, 30)
         label_list.append(back_label)
         self.back_line = QLineEdit()
-        self.back_line.setFixedSize(88, 30)
+        self.back_line.setFixedSize(180, 30)
         lineedit_list.append(self.back_line)
 
-        right_label = QLabel("右")
-        right_label.setFixedSize(28, 30)
-        label_list.append(right_label)
-        self.right_line = QLineEdit()
-        self.right_line.setFixedSize(88, 30)
-        lineedit_list.append(self.right_line)
-
         top_right_layout = QHBoxLayout()
-        top_right_layout.addWidget(left_label)
-        top_right_layout.addWidget(self.left_line)
         top_right_layout.addWidget(back_label)
         top_right_layout.addWidget(self.back_line)
-        top_right_layout.addWidget(right_label)
-        top_right_layout.addWidget(self.right_line)
 
         for label, line in zip(label_list, lineedit_list):
             label.setFont(font)
@@ -244,8 +222,9 @@ class MainWindow(QMainWindow):
 
         # 右侧开始布局 ----------------------------------------------
         #　添加右侧的倒车情景
-        g = GraphicsView()
-        # g.setFixedSize(450, 550)
+        self.width = 240
+        self.height = 300
+        g = GraphicsView(self.width, self.height)
         self.car = g.rect
         self.scene = g.scene
 
@@ -277,6 +256,8 @@ class MainWindow(QMainWindow):
         self.flag = 0
         self.dis = 0
         self.flag1 = 0
+        self.left_angle = 5
+        self.right_angle = 5
 
     def lift(self):
         self.com.lift()
@@ -286,9 +267,22 @@ class MainWindow(QMainWindow):
 
     def left(self):
         self.com.left()
+        pos = self.car.scenePos()
+        x, y = pos.x() + self.width / 2, pos.y() + self.height / 2
+        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setRotation(360 - self.left_angle)
+        self.left_angle += 5
+        self.right_angle -= 5
 
     def right(self):
         self.com.right()
+        pos = self.car.scenePos()
+        x, y = pos.x(), pos.y()
+        x, y = x + self.width / 2, y + self.height / 2
+        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setRotation(self.right_angle)
+        self.left_angle -= 5
+        self.right_angle += 5
 
     def stop(self):
         self.com.stop()
@@ -297,35 +291,30 @@ class MainWindow(QMainWindow):
         self.com.forward()
 
     def update(self, distance):
-        pass
-        # ql = queue.Queue(2)
-        # left = int(self.item.x())
-        # qb = queue.Queue(2)
-        # back = int(self.item.y())
-        # ql.put(left)
-        # qb.put(back)
-        # if ql.qsize() == 1:
-        #     self.left_line.setText(str(left))
-        # else:
-        #     if left - ql.get() > 1:
-        #         self.left_line.setText(str(left))
-        # if qb.qsize() == 1:
-        #     self.back_line.setText(str(100 - back))
-        # else:
-        #     if back - qb.get() > 1:
-        #         self.back_line.setText(str(100 - back))
+        self.back_line.setText(str(self.dis)[2:-5] + "cm")
 
     def move_pos(self, scene):
-        print(self.dis)
-        Left = [i for i in range(30, 32, 2)]
-        Center = [i for i in range(32, 34, 2)]
-        for it in scene.items():
-            self.item = it
-            for left, center in zip(Left, Center):
-                pos = QPointF(left, center)
-                if hasattr(it, 'move_smooth'):
-                    it.move_smooth(pos, 500)
-                    it._pos_animation.valueChanged.connect(self.update)
+        if self.dis != False:
+            # print(self.dis)
+            string = str(self.dis)
+            dis = int(string[2:-5])
+            if dis < 20:
+                for it in scene.items():
+                    self.item = it
+                    if dis < 5:
+                        y = 540 - self.height
+                    y = 550 - dis * 10 - self.height
+                    if self.left_angle == self.right_angle:
+                        x = 0
+                    if self.left_angle > self.right_angle:
+                        x = -(self.left_angle + self.right_angle)
+                    if self.right_angle > self.left_angle:
+                        x = self.left_angle + self.right_angle
+                    pos = QPointF(x, y - x)
+                    # print(self.car.scenePos()
+                    if hasattr(it, 'move_smooth'):
+                        it.move_smooth(pos, 200)
+                        it._pos_animation.valueChanged.connect(self.update)
 
     # 确定是按钮按下 而不是多线程发来的信号
     def update_begin(self):

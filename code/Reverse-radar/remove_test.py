@@ -112,8 +112,8 @@ class MainWindow(QMainWindow):
         btn_start.clicked.connect(self.run)
 
     def move_pos(self, scene):
-        Left = [i for i in range(30, 32, 2)]
-        Center = [i for i in range(32, 34, 2)]
+        Left = [100]
+        Center = [100]
         for it in scene.items():
             self.item = it
             for left, center in zip(Left, Center):

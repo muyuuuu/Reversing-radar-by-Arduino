@@ -26,18 +26,6 @@ from functools import partial
 class RectItem(QGraphicsRectItem):
     def __init__(self, rect=QRectF()):
         super(RectItem, self).__init__(rect)
-        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        self._pos_animation = QVariantAnimation()
-        self._pos_animation.valueChanged.connect(self.setPos)
-
-    def move_smooth(self, end, duration):
-        if self._pos_animation.state() == QAbstractAnimation.Running:
-            self._pos_animation.stop()
-        self._pos_animation.setDuration(duration)
-        self._pos_animation.setStartValue(self.pos())
-        self._pos_animation.setEndValue(end)
-        self._pos_animation.start()
 
 # 负责绘制车辆的类
 class GraphicsView(QGraphicsView):
@@ -54,7 +42,7 @@ class GraphicsView(QGraphicsView):
         # 创建车辆实例
         self.rect = RectItem()
 
-        # 初始化位置为 30 30 车辆宽度 250 长度 400
+        # 初始化位置为 0 0 车辆宽度 250 长度 400
         self.rect.setRect(0, 0, 240, 300)
 
         # 创建颜色刷子
@@ -75,7 +63,6 @@ class GraphicsView(QGraphicsView):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-
 
         # 整体布局从
         pagelayout = QHBoxLayout()
@@ -115,48 +102,6 @@ class MainWindow(QMainWindow):
         widget.setLayout(pagelayout)
         self.setCentralWidget(widget)
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-
-        btn_start.clicked.connect(self.run)
-        btn_rorate.clicked.connect(self.rorate_left)
-        btn_rorate1.clicked.connect(self.rorate_right)
-
-        self.angle_left = 2
-        self.angle_right = 2
-
-    # 以车辆中心为旋转点
-    def rorate_right(self):
-        pos = self.car.scenePos()
-        x = pos.x() + 120
-        y = pos.y() + 150
-        self.car.setTransformOriginPoint(QPointF(x, y))
-        self.car.setRotation(self.angle_right)
-        self.angle_right += 2
-        self.angle_left -= 2
-
-    def rorate_left(self):
-        pos = self.car.scenePos()
-        x = pos.x() + 120
-        y = pos.y() + 150
-        self.car.setTransformOriginPoint(QPointF(x, y))
-        self.car.setRotation(360 - self.angle_left)
-        self.angle_left += 2
-        self.angle_right -= 2
-
-    def move_pos(self, scene):
-        Left = [100]
-        Center = [100]
-        for it in scene.items():
-            self.item = it
-            for left, center in zip(Left, Center):
-                pos = QPointF(left, center)
-                if hasattr(it, 'move_smooth'):
-                    it.move_smooth(pos, 500)
-
-    def run(self, distance):
-        wrapper = partial(self.move_pos, self.scene)
-        timer = QTimer(interval=5000, timeout=wrapper)
-        timer.start()
-        wrapper()
 
 
 if __name__ == '__main__':

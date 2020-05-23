@@ -39,6 +39,7 @@ class RectItem(QGraphicsRectItem):
         self._pos_animation.setEndValue(end)
         self._pos_animation.start()
 
+
 # 负责绘制车辆的类
 class GraphicsView(QGraphicsView):
     def __init__(self):
@@ -55,7 +56,7 @@ class GraphicsView(QGraphicsView):
         self.rect = RectItem()
 
         # 初始化位置为 30 30 车辆宽度 250 长度 400
-        self.rect.setRect(0, 0, 240, 300)
+        self.rect.setRect(50, 50, 240, 300)
 
         # 创建颜色刷子
         brush1 = QBrush(Qt.SolidPattern)
@@ -75,7 +76,6 @@ class GraphicsView(QGraphicsView):
 class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-
 
         # 整体布局从
         pagelayout = QHBoxLayout()
@@ -103,6 +103,8 @@ class MainWindow(QMainWindow):
         g = GraphicsView()
         # g.setFixedSize(450, 550)
         self.car = g.rect
+        # (0, 0)
+        # print(self.car.scenePos().x())
         self.scene = g.scene
 
         # print(self.scene.x())
@@ -114,7 +116,7 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(pagelayout)
         self.setCentralWidget(widget)
-        self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+        # self.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 
         btn_start.clicked.connect(self.run)
         btn_rorate.clicked.connect(self.rorate_left)
@@ -123,34 +125,44 @@ class MainWindow(QMainWindow):
         self.angle_left = 2
         self.angle_right = 2
 
+
+        # 获取旋转中心
+        self.rotate_pos = (self.car.scenePos().x() + 120,
+                           self.car.scenePos().x() + 150)
+
     # 以车辆中心为旋转点
     def rorate_right(self):
-        pos = self.car.scenePos()
-        x = pos.x() + 120
-        y = pos.y() + 150
-        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setTransformOriginPoint(
+            QPointF(self.rotate_pos[0], self.rotate_pos[1]))
         self.car.setRotation(self.angle_right)
         self.angle_right += 2
         self.angle_left -= 2
 
     def rorate_left(self):
-        pos = self.car.scenePos()
-        x = pos.x() + 120
-        y = pos.y() + 150
-        self.car.setTransformOriginPoint(QPointF(x, y))
+        self.car.setTransformOriginPoint(
+            QPointF(self.rotate_pos[0], self.rotate_pos[1]))
         self.car.setRotation(360 - self.angle_left)
         self.angle_left += 2
         self.angle_right -= 2
 
     def move_pos(self, scene):
-        Left = [100]
-        Center = [100]
+        x = 0
+        y = 0
+        pos = QPointF(0, 0)
+        if self.angle_left > self.angle_right:
+            # 负数表示向左前方移动 正数表示向左后方移动
+            x = -100 * math.sin(self.angle_left / 180 * math.pi)
+            y = -100 * math.cos(self.angle_left / 180 * math.pi)
+            pos = QPointF(self.car.pos().x() + x, self.car.pos().x() + y)
+        else:
+            print("here")
+            x = 100 * math.sin(self.angle_right / 180 * math.pi)
+            y = 100 * math.cos(self.angle_right / 180 * math.pi)
+            pos = QPointF(self.car.pos().x() - x, self.car.pos().x() + y)
         for it in scene.items():
             self.item = it
-            for left, center in zip(Left, Center):
-                pos = QPointF(left, center)
-                if hasattr(it, 'move_smooth'):
-                    it.move_smooth(pos, 500)
+            if hasattr(it, 'move_smooth'):
+                it.move_smooth(pos, 500)
 
     def run(self, distance):
         wrapper = partial(self.move_pos, self.scene)
@@ -162,5 +174,6 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     demo = MainWindow()
+    demo.setStyleSheet('Fusion')
     demo.show()
     sys.exit(app.exec_())

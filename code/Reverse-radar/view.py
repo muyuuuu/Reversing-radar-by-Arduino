@@ -259,11 +259,14 @@ class MainWindow(QMainWindow):
         self.left_angle = 5
         self.right_angle = 5
 
+        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
+
     def lift(self):
         self.com.lift()
 
     def back(self):
         self.com.back()
+        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def left(self):
         self.com.left()
@@ -286,9 +289,11 @@ class MainWindow(QMainWindow):
 
     def stop(self):
         self.com.stop()
+        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def forward(self):
         self.com.forward()
+        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def update(self, distance):
         self.back_line.setText(str(self.dis)[2:-5] + "cm")
@@ -302,8 +307,9 @@ class MainWindow(QMainWindow):
                 for it in scene.items():
                     self.item = it
                     if dis < 5:
-                        y = 540 - self.height
-                    y = 550 - dis * 10 - self.height
+                        y = 550 - 10 - self.height
+                    else:
+                        y = 550 - dis * 10 - self.height
                     if self.left_angle == self.right_angle:
                         x = 0
                     if self.left_angle > self.right_angle:

@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import (QApplication, QGraphicsRectItem, QGraphicsScene,
                              QPushButton, QGraphicsItem, QHBoxLayout, QLabel,
                              QLineEdit, QGridLayout)
 from functools import partial
+import math
 
 
 class RectItem(QGraphicsRectItem):
@@ -259,29 +260,32 @@ class MainWindow(QMainWindow):
         self.left_angle = 5
         self.right_angle = 5
 
-        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
+        self.rotate_pos = (self.car.pos().x() + self.width / 2, self.car.pos().x() + self.height / 2)
+
+        self.direction = 1
 
     def lift(self):
         self.com.lift()
 
     def back(self):
+        self.direction = 1
         self.com.back()
-        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def left(self):
+        self.direction = -1
         self.com.left()
-        pos = self.car.scenePos()
-        x, y = pos.x() + self.width / 2, pos.y() + self.height / 2
+        pos = self.rotate_pos
+        x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
         self.car.setTransformOriginPoint(QPointF(x, y))
         self.car.setRotation(360 - self.left_angle)
         self.left_angle += 5
         self.right_angle -= 5
 
     def right(self):
+        self.direction = -1
         self.com.right()
-        pos = self.car.scenePos()
-        x, y = pos.x(), pos.y()
-        x, y = x + self.width / 2, y + self.height / 2
+        pos = self.rotate_pos
+        x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
         self.car.setTransformOriginPoint(QPointF(x, y))
         self.car.setRotation(self.right_angle)
         self.left_angle -= 5
@@ -289,11 +293,10 @@ class MainWindow(QMainWindow):
 
     def stop(self):
         self.com.stop()
-        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def forward(self):
+        self.direction = -1
         self.com.forward()
-        self.rotate_pos = (self.car.scenePos().x() + self.width / 2, self.car.scenePos().x() + self.height / 2)
 
     def update(self, distance):
         self.back_line.setText(str(self.dis)[2:-5] + "cm")
@@ -313,14 +316,15 @@ class MainWindow(QMainWindow):
                     if self.left_angle == self.right_angle:
                         x = 0
                     if self.left_angle > self.right_angle:
-                        x = -(self.left_angle + self.right_angle)
+                        x = -(self.left_angle)
                     if self.right_angle > self.left_angle:
-                        x = self.left_angle + self.right_angle
+                        x = self.right_angle
                     pos = QPointF(x, y - x)
                     # print(self.car.scenePos()
                     if hasattr(it, 'move_smooth'):
                         it.move_smooth(pos, 200)
                         it._pos_animation.valueChanged.connect(self.update)
+
 
     # 确定是按钮按下 而不是多线程发来的信号
     def update_begin(self):

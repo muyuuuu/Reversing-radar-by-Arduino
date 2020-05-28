@@ -153,12 +153,11 @@ class MainWindow(QMainWindow):
             # 负数表示向左前方移动 正数表示向左后方移动
             x = -100 * math.sin(self.angle_left / 180 * math.pi)
             y = -100 * math.cos(self.angle_left / 180 * math.pi)
-            pos = QPointF(self.car.pos().x() + x, self.car.pos().x() + y)
+            pos = QPointF(self.car.pos().x() + x, self.car.pos().y() + y)
         else:
-            print("here")
             x = 100 * math.sin(self.angle_right / 180 * math.pi)
             y = 100 * math.cos(self.angle_right / 180 * math.pi)
-            pos = QPointF(self.car.pos().x() - x, self.car.pos().x() + y)
+            pos = QPointF(self.car.pos().x() - x, self.car.pos().y() + y)
         for it in scene.items():
             self.item = it
             if hasattr(it, 'move_smooth'):

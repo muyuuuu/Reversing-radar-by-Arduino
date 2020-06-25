@@ -257,8 +257,8 @@ class MainWindow(QMainWindow):
         self.flag = 0
         self.dis = 0
         self.flag1 = 0
-        self.left_angle = 5
-        self.right_angle = 5
+        self.left_angle = 2
+        self.right_angle = 2
 
         self.rotate_pos = (self.car.pos().x() + self.width / 2, self.car.pos().x() + self.height / 2)
 
@@ -272,24 +272,26 @@ class MainWindow(QMainWindow):
         self.com.back()
 
     def left(self):
-        self.direction = -1
         self.com.left()
-        pos = self.rotate_pos
-        x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
-        self.car.setTransformOriginPoint(QPointF(x, y))
-        self.car.setRotation(360 - self.left_angle)
-        self.left_angle += 5
-        self.right_angle -= 5
+        if self.flag == 1:
+            self.direction = -1
+            pos = self.rotate_pos
+            x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
+            self.car.setTransformOriginPoint(QPointF(x, y))
+            self.car.setRotation(360 - self.left_angle)
+            self.left_angle += 2
+            self.right_angle -= 2
 
     def right(self):
-        self.direction = -1
         self.com.right()
-        pos = self.rotate_pos
-        x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
-        self.car.setTransformOriginPoint(QPointF(x, y))
-        self.car.setRotation(self.right_angle)
-        self.left_angle -= 5
-        self.right_angle += 5
+        if self.flag == 1:
+            self.direction = -1
+            pos = self.rotate_pos
+            x, y = pos[0] + self.width / 2, pos[1] + self.height / 2
+            self.car.setTransformOriginPoint(QPointF(x, y))
+            self.car.setRotation(self.right_angle)
+            self.left_angle -= 2
+            self.right_angle += 2
 
     def stop(self):
         self.com.stop()
@@ -348,6 +350,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    # app.setStyleSheet("Fusion")
     demo = MainWindow()
     demo.show()
     sys.exit(app.exec_())

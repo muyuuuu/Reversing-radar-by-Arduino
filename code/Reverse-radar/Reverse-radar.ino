@@ -47,7 +47,7 @@ int input8 = 7;
 String str = "";
 // 后侧超声波
 long cmB = 12, cmR, cmL;
-int speed = 95, flag = 0;
+int speed = 100, flag = 0;
 
 void setup() 
 {
@@ -247,7 +247,7 @@ void loop()
 		digitalWrite(trigBack, LOW);
 		// 计算后方超声波的距离
 		cmB = (pulseIn(echoBack, HIGH) / 2) / 29.1;
-		if (cmB < 9)
+		if (cmB < 15)
 		{
 			stop();
 		}

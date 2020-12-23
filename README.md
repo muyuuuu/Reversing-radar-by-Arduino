@@ -10,6 +10,7 @@
 
 1. `code/Reverse-radar`：`view.py`是上位机软件，`Reverse-radar.ino`是`Arduino`端的代码；
 2. `code`其他文件夹都是测试代码；
+3. `CircuitSch` 文件夹下是电路连接图。
 
 # 缺陷
 

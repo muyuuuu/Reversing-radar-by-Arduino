@@ -1,4 +1,0 @@
-\contentsline {section}{\numberline {1}前言}{2}{section.1}%
-\contentsline {section}{\numberline {2}格式注意事项}{2}{section.2}%
-\contentsline {section}{\numberline {3}内容要求}{3}{section.3}%
-\contentsline {section}{\numberline {4}字数}{3}{section.4}%

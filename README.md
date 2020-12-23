@@ -4,7 +4,7 @@
 
 # 演示
 
-把视频放bilibili了：https://www.bilibili.com/video/BV1Za4y1s7Ay/
+把演示视频放bilibili了：https://www.bilibili.com/video/BV1Za4y1s7Ay/
 
 # Intro
 
